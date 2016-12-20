@@ -2,8 +2,8 @@ import Backbone from 'backbone'
 import $ from 'jquery'
 import Login from './views/Login'
 import Signup from './views/Signup'
+import Nav from './views/Nav'
 // import List from './views/List'
-// import Nav from './views/Nav'
 // import Create from './views/Create'
 
 const Router = Backbone.Router.extend({
@@ -25,10 +25,10 @@ const Router = Backbone.Router.extend({
 		$('#app').empty().append(signup.render().$el)
 	},
 
-	// appRoute() {
-	// 	let nav = new Nav()
-	// 	$('#page').empty().append(nav.render().$el)
-	// },
+	appRoute() {
+		let nav = new Nav()
+		$('#app').empty().append(nav.render().$el)
+	},
 	
 });
 

@@ -10,22 +10,40 @@ const Session = Backbone.Model.extend({
 		authtoken: false,
 	},
 
-	// signup(name, username, password1, password2) {
-	// 	console.group('signup info')
-	// 		console.log('Name:', name )
-	// 		console.log('Username:', username )
-	// 		console.log('Password1:', password1 )
-	// 		console.log('Password2:', password2 )
-	// 		console.log('PW1 = PW1:', password1 === password2 )
-	// 	console.groupEnd('signup info')
-	// },
+	signup(newName, newUser, newPass) {
+		this.save({
+			name: newName,
+			username: newUser,
+			password: newPass
+		}, {
+			url: `http://baas.kinvey.com/user/${settings.appKey}`,
+			success: (model, response) => {
+				model.unset('password')
+				this.set('username', newUser)
+				this.set('authtoken', response._kmd.authtoken)
+				router.navigate('app', {trigger: true})
+				console.log('SUCCESS: you created a user', 
+					response, model )
+			},
+			error: (model, response) => {
+				console.log('ERROR: signup failed', response )
+			}
+		})
+	},
 
-	// login(username, password) {
-	// 	console.group('login info')
-	// 		console.log('Username:', username )
-	// 		console.log('Password:', password )
-	// 	console.groupEnd('login info')
-	// },
+	parse(response) {
+		return {
+			username: response.username,
+			authtoken: response._kmd.authtoken,
+			userId: response._id
+		}
+	},
+
+	retrieve() {
+		this.fetch({
+			url: `${this.urlRoot}/_me`
+		})
+	}
 
 });
 

@@ -13416,8 +13416,41 @@
 		defaults: {
 			username: 'defaultUsername',
 			authtoken: false
-		}
+		},
 
+		signup: function signup(newName, newUser, newPass) {
+			var _this = this;
+
+			this.save({
+				name: newName,
+				username: newUser,
+				password: newPass
+			}, {
+				url: 'http://baas.kinvey.com/user/' + _settings2.default.appKey,
+				success: function success(model, response) {
+					model.unset('password');
+					_this.set('username', newUser);
+					_this.set('authtoken', response._kmd.authtoken);
+					router.navigate('app', { trigger: true });
+					console.log('SUCCESS: you created a user', response, model);
+				},
+				error: function error(model, response) {
+					console.log('ERROR: signup failed', response);
+				}
+			});
+		},
+		parse: function parse(response) {
+			return {
+				username: response.username,
+				authtoken: response._kmd.authtoken,
+				userId: response._id
+			};
+		},
+		retrieve: function retrieve() {
+			this.fetch({
+				url: this.urlRoot + '/_me'
+			});
+		}
 	});
 
 	var session = new Session();
@@ -13466,10 +13499,13 @@
 
 	var _Signup2 = _interopRequireDefault(_Signup);
 
+	var _Nav = __webpack_require__(9);
+
+	var _Nav2 = _interopRequireDefault(_Nav);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// import List from './views/List'
-	// import Nav from './views/Nav'
 	// import Create from './views/Create'
 
 	var Router = _backbone2.default.Router.extend({
@@ -13488,6 +13524,10 @@
 		signupRoute: function signupRoute() {
 			var signup = new _Signup2.default();
 			(0, _jquery2.default)('#app').empty().append(signup.render().$el);
+		},
+		appRoute: function appRoute() {
+			var nav = new _Nav2.default();
+			(0, _jquery2.default)('#app').empty().append(nav.render().$el);
 		}
 	});
 
@@ -13526,16 +13566,14 @@
 		tagName: 'form',
 		className: 'login-form',
 		events: {
-			'submit input[.loginBtn]': 'submitHandler'
+			'submit': 'submitHandler'
 		},
 
 		submitHandler: function submitHandler(e) {
 			e.preventDefault();
-			console.log(e);
-			// let username = this.$('.username').val()
-			// let password = this.$('.password').val()
-			// console.log( username )
-			// console.log( password )
+			var username = this.$('#username').val();
+			var password = this.$('#password').val();
+			_session2.default.login(username, password);
 		},
 		template: function template() {
 			return '\n\t\t<h2>Log In</h2>\n\t\t<input type="text" class="username" id="username" placeholder="username"/>\n\t\t<input type="text" class="password" id="password" placeholder="password"/>\n\t\t<input type="submit" class="loginBtn" id="loginBtn" value="login"/>\n\t\t<p>Not a member: <a href="#signup"> Sign up</a> </p>\n\t\t';
@@ -13580,20 +13618,26 @@
 		tagName: 'form',
 		className: 'signup-form',
 		events: {
-			'submit #signupBtn': 'submitHandler'
+			'submit': 'submitHandler'
 		},
 
 		submitHandler: function submitHandler(e) {
 			e.preventDefault();
-			var name = this.$('#newName').val();
-			var username = this.$('#newUser').val();
-			var password1 = this.$('#newPass1').val();
-			var password2 = this.$('#newPass2').val();
+			var newPass = void 0;
+			var newName = this.$('#newName').val();
+			var newUser = this.$('#newUser').val();
+			var newPass1 = this.$('#newPass1').val();
+			var newPass2 = this.$('#newPass2').val();
 
-			_session2.default.signup(name, username, password1, password2);
+			if (newPass1 === newPass2) {
+				newPass = newPass1;
+			} else {
+				alert('Your passwords do not match. Please try again');
+			}
+			_session2.default.signup(newName, newUser, newPass);
 		},
 		template: function template() {
-			return '\n\t\t<h2>Sign Up</h2>\n\t\t<input type="text" id="newName" placeholder="Full Name"/>\n\t\t<input type="text" id="newUser" placeholder="Username"/>\n\t\t<input type="text" id="newPass1" placeholder="Password"/>\n\t\t<input type="text" id="newPass2" placeholder="Retype Password"/>\n\t\t<input type="submit" id="signupBtn" value="signup"/>\n\t\t<p>Already a member: <a href="#login"> Log in</a> </p>\n\t\t';
+			return '\n\t\t<h2>Sign Up</h2>\n\t\t<input type="text" id="newName" placeholder="Full Name"/>\n\t\t<input type="text" id="newUser" placeholder="Username"/>\n\t\t<input type="password" id="newPass1" placeholder="Password"/>\n\t\t<input type="password" id="newPass2" placeholder="Retype Password"/>\n\t\t<input type="submit" id="signupBtn" value="signup"/>\n\t\t<p>Already a member: <a href="#login"> Log in</a> </p>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
@@ -13602,6 +13646,56 @@
 	});
 
 	exports.default = Signup;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _session = __webpack_require__(4);
+
+	var _session2 = _interopRequireDefault(_session);
+
+	var _router = __webpack_require__(6);
+
+	var _router2 = _interopRequireDefault(_router);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Nav = _backbone2.default.View.extend({
+		tagName: 'nav',
+		className: 'nav',
+
+		events: {
+			'click .logoutBtn': 'clickHandler'
+		},
+
+		clickHandler: function clickHandler(e) {
+			console.log("log out");
+		},
+		template: function template() {
+			return '\n\t\t<nav>\n\t\t\t<button class="logoutBtn">\n\t\t\t\tLogout\n\t\t\t</button>\n\t\t\t<h3 class="getUsername"> \n\t\t\t\tHello, ' + _session2.default.get('username') + '\n\t\t\t</h3>\n\t\t</nav>\n\t\t';
+		},
+		render: function render() {
+			this.$el.html(this.template());
+			return this;
+		}
+	});
+
+	exports.default = Nav;
 
 /***/ }
 /******/ ]);

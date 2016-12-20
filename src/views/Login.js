@@ -7,16 +7,14 @@ const Login = Backbone.View.extend({
 	tagName: 'form',
 	className: 'login-form',
 	events: {
-		'submit input[.loginBtn]' : 'submitHandler'
+		'submit' : 'submitHandler'
 	},
 
 	submitHandler(e) {
 		e.preventDefault()
-		console.log( e )
-		// let username = this.$('.username').val()
-		// let password = this.$('.password').val()
-		// console.log( username )
-		// console.log( password )
+		let username = this.$('#username').val()
+		let password = this.$('#password').val()
+		session.login(username, password)
 	},
 
 	template() {

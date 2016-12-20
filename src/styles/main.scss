@@ -1,0 +1,18 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif
+}
+nav {
+	height: 60px;
+	background: palevioletred;
+	display: flex;
+	// justify-content
+	button {
+		padding: 1rem;
+		background: #34BD87;
+	}
+	h3 {
+		align-self: flex-end;
+	}
+}
