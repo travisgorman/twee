@@ -1,8 +1,11 @@
-# A basic webpack project
+# Twee
+An excessively quaint Twitter clone kinda thing.
 
-This is the most basic webpack project you will find. It's what I made for my blogpost called [webpack is not as hard as you think](http://jilles.me/webpack-is-not-that-complicated/).
+* Kinvey/MongoDB for back end data
+* Backbone.js for models and views
+* Webpack for module bundling
+* Babel for ES6 (and maybe JSX)
+* etc...
 
 
-### Installing
 
-Run `npm i && webpack --watch` to install dependencies and run webpack in a watching state. Then start a webserver in /public and you're good to go!
