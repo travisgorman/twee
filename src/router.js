@@ -4,7 +4,7 @@ import Login from './views/Login'
 import Signup from './views/Signup'
 import Nav from './views/Nav'
 import session from './models/session'
-// import List from './views/List'
+import List from './views/List'
 // import Create from './views/Create'
 
 const Router = Backbone.Router.extend({
@@ -28,10 +28,15 @@ const Router = Backbone.Router.extend({
 
 	appRoute() {
 		let nav = new Nav()
-		$('#app').empty().append(nav.render().$el)
+		let list = new List()
+
+		$('#app').empty()
+			.append(nav.render().$el)
+				.append(list.render().$el)
+
 		console.log('session:', session )
 		console.log('session authtoken:', session.get('authtoken'))
-		console.log('session username:', session.get('username') )
+		console.log('session username:', session.get('username'))
 	},
 	
 });

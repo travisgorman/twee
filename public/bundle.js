@@ -72,12 +72,14 @@
 
 	_session2.default.set('authtoken', localStorage.getItem('authtoken'));
 	_session2.default.set('username', localStorage.getItem('username'));
+	_session2.default.set('name', localStorage.getItem('name'));
 
 	console.log('session.authtoken:', _session2.default.get('authtoken'));
 	console.log('session.username:', _session2.default.get('username'));
-
-	console.log('basicAuth:', _settings2.default.basicAuth);
+	console.log('session.name:', _session2.default.get('name'));
 	console.log('kinveyAuth:', 'Kinvey ' + _session2.default.get('authtoken'));
+	console.log('localStorage authtoken:', localStorage.getItem('authtoken'));
+	console.log('localStorage username:', localStorage.getItem('username'));
 
 	(0, _jquery2.default)(document).ajaxSend(function (evt, xhr, jquerySettings) {
 		if (_session2.default.get('authtoken')) {
@@ -13450,6 +13452,7 @@
 					// model.unset('password')
 					window.localStorage.setItem('username', response.username);
 					window.localStorage.setItem('authtoken', response._kmd.authtoken);
+					window.localStorage.setItem('name', response.name);
 
 					_this.set(_this.parse(response));
 
@@ -13469,11 +13472,55 @@
 				}
 			});
 		},
-		logout: function logout() {
-			_router2.default.navigate('login', { trigger: true });
-			console.log(this);
+
+
+		login: function login(username, password) {
+
+			this.save({
+				username: username,
+				password: password
+			}, {
+				type: 'POST',
+				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/login',
+				success: function success(model, response) {
+					window.localStorage.setItem('authtoken', response._kmd.authtoken);
+					window.localStorage.setItem('username', response.username);
+					console.log('SUCCESS! You are logged in. MODEL:', model);
+					console.log('SUCCESS! You are logged in. RESPONSE:', response);
+					_router2.default.navigate('app', { trigger: true });
+				},
+				error: function error() {
+					console.log('ERROR! You did not log in a user');
+				}
+			});
 		},
 
+		logout: function logout() {
+			this.clear();
+			console.log('logout on session:', this);
+			window.localStorage.clear();
+			_router2.default.navigate('login', { trigger: true });
+			console.log('USER LOGGED OUT:', this);
+			console.log('localStorage:', localStorage.getItem('authtoken'), localStorage.getItem('authtoken'));
+
+			// this.save(null, {
+			// 	type: 'POST',
+			// 	url: `https://baas.kinvey.com/user/${settings.appKey}/_logout`,
+			// 	success: (model, response) => {
+			// 		model.clear()
+			// 		window.localStorage.clear()
+			// 		this.trigger('change')
+			// 		router.navigate('login', {trigger: true})
+			// 		console.log('USER LOGGED OUT:', this,)
+			// 		console.log('localStorage:', 
+			// 			localStorage.getItem('authtoken'),
+			// 			localStorage.getItem('authtoken'))
+			// 	},
+			// 	error: function() {
+			// 		throw new Error('LOGOUT FAILED')
+			// 	}
+			// });
+		},
 
 		parse: function parse(response) {
 			if (response) {
@@ -13556,9 +13603,12 @@
 
 	var _session2 = _interopRequireDefault(_session);
 
+	var _List = __webpack_require__(14);
+
+	var _List2 = _interopRequireDefault(_List);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// import List from './views/List'
 	// import Create from './views/Create'
 
 	var Router = _backbone2.default.Router.extend({
@@ -13580,7 +13630,10 @@
 		},
 		appRoute: function appRoute() {
 			var nav = new _Nav2.default();
-			(0, _jquery2.default)('#app').empty().append(nav.render().$el);
+			var list = new _List2.default();
+
+			(0, _jquery2.default)('#app').empty().append(nav.render().$el).append(list.render().$el);
+
 			console.log('session:', _session2.default);
 			console.log('session authtoken:', _session2.default.get('authtoken'));
 			console.log('session username:', _session2.default.get('username'));
@@ -13790,7 +13843,7 @@
 
 
 	// module
-	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n", ""]);
+	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n\n.twee-list-view {\n  border: 10px solid #FFC600; }\n\n.twee-list {\n  border: 8px solid #FFC600;\n  padding: 1.5rem; }\n\n.twee-item {\n  border: 5px solid red; }\n", ""]);
 
 	// exports
 
@@ -14102,6 +14155,50 @@
 		return list;
 	};
 
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _session = __webpack_require__(4);
+
+	var _session2 = _interopRequireDefault(_session);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var List = _backbone2.default.View.extend({
+		className: 'twee-list-view',
+		// initialize: {},
+
+		// events: {
+		// 	'change' : () => this.render
+		// }
+
+		template: function template() {
+			return '\n\t\t<h3>Aww shucks ' + _session2.default.get('name') + '</h3>\n\t\t<ul class="twee-list">\n\t\t\t<li class="twee-item">\n\t\t\t\t<h5>' + _session2.default.get('name') + '</h5>\n\t\t\t\t<span>timestamp</span>\n\t\t\t\t<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem ipsa ut culpa vitae, impedit consectetur aliquid qui suscipit eligendi.</p>\n\t\t\t<li>\n\t\t</ul>\n\t\t';
+		},
+
+		render: function render() {
+			this.$el.html(this.template());
+			return this;
+		}
+	});
+
+	exports.default = List;
 
 /***/ }
 /******/ ]);

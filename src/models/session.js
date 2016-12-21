@@ -27,6 +27,7 @@ const Session = Backbone.Model.extend({
 				// model.unset('password')
 				window.localStorage.setItem('username', response.username)
 				window.localStorage.setItem('authtoken', response._kmd.authtoken)
+				window.localStorage.setItem('name', response.name)
 
 				this.set(this.parse(response))
 
@@ -50,9 +51,55 @@ const Session = Backbone.Model.extend({
 
 	},
 
-	logout() {
+	login: function(username, password) {
+
+	this.save({
+		username: username,
+		password: password
+	}, 
+	{
+		type: 'POST',
+		url: `https://baas.kinvey.com/user/${settings.appKey}/login`,
+		success: (model, response) => {
+			window.localStorage.setItem('authtoken', response._kmd.authtoken)
+			window.localStorage.setItem('username', response.username)
+			console.log('SUCCESS! You are logged in. MODEL:', model)
+			console.log('SUCCESS! You are logged in. RESPONSE:', response)
+			router.navigate('app', {trigger: true})
+		},
+		error: function() {
+			console.log('ERROR! You did not log in a user')
+		}
+	})
+},
+
+	logout: function() {
+		this.clear()
+		console.log('logout on session:', this )
+		window.localStorage.clear()
 		router.navigate('login', {trigger: true})
-		console.log( this )
+		console.log('USER LOGGED OUT:', this,)
+		console.log('localStorage:', 
+			localStorage.getItem('authtoken'),
+			localStorage.getItem('authtoken'))
+
+		// this.save(null, {
+		// 	type: 'POST',
+		// 	url: `https://baas.kinvey.com/user/${settings.appKey}/_logout`,
+		// 	success: (model, response) => {
+		// 		model.clear()
+		// 		window.localStorage.clear()
+		// 		this.trigger('change')
+		// 		router.navigate('login', {trigger: true})
+		// 		console.log('USER LOGGED OUT:', this,)
+		// 		console.log('localStorage:', 
+		// 			localStorage.getItem('authtoken'),
+		// 			localStorage.getItem('authtoken'))
+		// 	},
+		// 	error: function() {
+		// 		throw new Error('LOGOUT FAILED')
+		// 	}
+		// });
 	},
 
   parse: function (response) {

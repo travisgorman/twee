@@ -7,13 +7,14 @@ require('./styles/main.scss')
 
 session.set('authtoken', localStorage.getItem('authtoken'))
 session.set('username', localStorage.getItem('username'))
+session.set('name', localStorage.getItem('name'))
 
 console.log('session.authtoken:', session.get('authtoken') )
 console.log('session.username:', session.get('username') )
-
-console.log('basicAuth:', settings.basicAuth )
+console.log('session.name:', session.get('name') )
 console.log('kinveyAuth:', `Kinvey ${session.get('authtoken')}` )
-
+console.log('localStorage authtoken:', localStorage.getItem('authtoken') )
+console.log('localStorage username:', localStorage.getItem('username') )
 
 $(document).ajaxSend(function(evt, xhr, jquerySettings) {
 	if (session.get('authtoken')) {
