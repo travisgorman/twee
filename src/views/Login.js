@@ -22,8 +22,8 @@ const Login = Backbone.View.extend({
 		<h2>Log In</h2>
 		<input type="text" class="username" id="username" placeholder="username"/>
 		<input type="text" class="password" id="password" placeholder="password"/>
-		<input type="submit" class="loginBtn" id="loginBtn" value="login"/>
-		<p>Not a member: <a href="#signup"> Sign up</a> </p>
+		<input type="submit" class="loginBtn" value="login"/>
+		<p>Not a member yet? <a href="#signup"> Sign up now</a> </p>
 		`
 	},
 

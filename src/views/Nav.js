@@ -6,31 +6,31 @@ import router from '../router'
 const Nav = Backbone.View.extend({
 	tagName: 'nav',
 	className: 'nav',
-
 	events: {
 		'click .logoutBtn' : 'clickHandler'
 	},
 
 	clickHandler(e) {
 		console.log( "log out" )
+		session.logout();
 	},
 
 	template() {
 		return `
-		<nav>
-			<button class="logoutBtn">
-				Logout
-			</button>
-			<h3 class="getUsername"> 
-				Hello, ${session.get('username')}
-			</h3>
-		</nav>
+			  <button class="logoutBtn">logout</button>
+			  <div class="username">
+			    <h3>hello, 
+			      <span>${session.get('username')}</span> welcome to 
+			      <span class="logo">TWEE</span>
+			    </h3>
+			  </div>
 		`
 	},
 
 	render() {
 		this.$el.html(this.template())
 		return this
+		console.log('authtokem:', session.get('authtoken') )
 	}
 	
 });

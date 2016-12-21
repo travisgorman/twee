@@ -21,6 +21,7 @@ const Signup = Backbone.View.extend({
 		if (newPass1 === newPass2) {
 			newPass = newPass1;
 		} else {alert('Your passwords do not match. Please try again')}
+
 		session.signup(newName, newUser, newPass)
 	},
 
@@ -31,8 +32,8 @@ const Signup = Backbone.View.extend({
 		<input type="text" id="newUser" placeholder="Username"/>
 		<input type="password" id="newPass1" placeholder="Password"/>
 		<input type="password" id="newPass2" placeholder="Retype Password"/>
-		<input type="submit" id="signupBtn" value="signup"/>
-		<p>Already a member: <a href="#login"> Log in</a> </p>
+		<input type="submit" class="signupBtn" id="signupBtn" value="signup"/>
+		<p>Already a member? <a href="#login"> Log in</a> </p>
 		`
 	},
 

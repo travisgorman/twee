@@ -68,14 +68,22 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	__webpack_require__(10);
+
+	_session2.default.set('authtoken', localStorage.getItem('authtoken'));
+	_session2.default.set('username', localStorage.getItem('username'));
+
 	console.log('session.authtoken:', _session2.default.get('authtoken'));
 	console.log('session.username:', _session2.default.get('username'));
 
-	(0, _jquery2.default)(document).ajaxSend(function (e, xhr) {
+	console.log('basicAuth:', _settings2.default.basicAuth);
+	console.log('kinveyAuth:', 'Kinvey ' + _session2.default.get('authtoken'));
+
+	(0, _jquery2.default)(document).ajaxSend(function (evt, xhr, jquerySettings) {
 		if (_session2.default.get('authtoken')) {
 			xhr.setRequestHeader('Authorization', 'Kinvey ' + _session2.default.get('authtoken'));
 		} else {
-			xhr.setRequestHeader('Authorization', 'Basic ' + _settings2.default.basicAuth);
+			xhr.setRequestHeader('Authorization', _settings2.default.basicAuth);
 		}
 	});
 
@@ -83,9 +91,11 @@
 	_backbone2.default.history.start();
 
 	// if I have an authtoken, call session.retrieve
-	if (_session2.default.get('authtoken')) {
+	if (!localStorage.getItem('authtoken')) {
+		console.log('you are not logged in:', localStorage.getItem('authtoken'));
+		_router2.default.navigate('login', { trigger: true });
+	} else {
 		_session2.default.retrieve();
-		_router2.default.navigate('app', { trigger: true });
 	}
 
 /***/ },
@@ -13407,10 +13417,14 @@
 
 	var _settings2 = _interopRequireDefault(_settings);
 
+	var _router = __webpack_require__(6);
+
+	var _router2 = _interopRequireDefault(_router);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Session = _backbone2.default.Model.extend({
-		urlRoot: 'http://baas.kinvey.com/user/' + _settings2.default.appKey,
+		urlRoot: 'https://baas.kinvey.com/user/' + _settings2.default.appKey,
 		idAttribute: '_id',
 
 		defaults: {
@@ -13421,36 +13435,71 @@
 		signup: function signup(newName, newUser, newPass) {
 			var _this = this;
 
+			console.log('name:', newName);
+			console.log('username:', newUser);
+			console.log('password:', newPass);
+			console.log('url:', session.urlRoot);
+
 			this.save({
 				name: newName,
 				username: newUser,
 				password: newPass
 			}, {
-				url: 'http://baas.kinvey.com/user/' + _settings2.default.appKey,
+				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey,
 				success: function success(model, response) {
-					model.unset('password');
-					_this.set('username', newUser);
-					_this.set('authtoken', response._kmd.authtoken);
-					router.navigate('app', { trigger: true });
-					console.log('SUCCESS: you created a user', response, model);
+					// model.unset('password')
+					window.localStorage.setItem('username', response.username);
+					window.localStorage.setItem('authtoken', response._kmd.authtoken);
+
+					_this.set(_this.parse(response));
+
+					// this.set('username', newUser)
+					// this.set('authtoken', response._kmd.authtoken)
+					// this.set('userId', response._id)
+
+					console.log('SUCCESS: you created a user! Response', response);
+					console.log('SUCCESS: you created a user! Model', model);
+
+					console.log('parse this:', _this.parse(response));
+
+					_router2.default.navigate('app', { trigger: true });
 				},
 				error: function error(model, response) {
 					console.log('ERROR: signup failed', response);
 				}
 			});
 		},
-		parse: function parse(response) {
-			return {
-				username: response.username,
-				authtoken: response._kmd.authtoken,
-				userId: response._id
-			};
+		logout: function logout() {
+			_router2.default.navigate('login', { trigger: true });
+			console.log(this);
 		},
+
+
+		parse: function parse(response) {
+			if (response) {
+				console.log('response from Kinvey/user/{GET}:', response);
+				return {
+					authtoken: response._kmd.authtoken,
+					username: response.username,
+					userId: response._id,
+					name: response.name
+
+				};
+			}
+		},
+
 		retrieve: function retrieve() {
+			var _this2 = this;
+
 			this.fetch({
-				url: this.urlRoot + '/_me'
+				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/_me',
+				success: function success(model, response) {
+					console.log('response from Kinvey/user/_me: ', response);
+					console.log('USER RETRIEVED: ', _this2);
+				}
 			});
 		}
+
 	});
 
 	var session = new Session();
@@ -13466,10 +13515,10 @@
 		value: true
 	});
 	var settings = {
-		baseUrl: 'http://baas.kinvey.com',
+		baseUrl: 'https://baas.kinvey.com',
 		appKey: 'kid_Bykx07CD',
 		appSecret: 'cb36be00b0bc4d838c13d645a3389df0',
-		basicAuth: btoa('kid_Bykx07CD:cb36be00b0bc4d838c13d645a3389df0')
+		basicAuth: 'Basic ' + btoa('kid_Bykx07CD:cb36be00b0bc4d838c13d645a3389df0')
 	};
 	exports.default = settings;
 
@@ -13503,6 +13552,10 @@
 
 	var _Nav2 = _interopRequireDefault(_Nav);
 
+	var _session = __webpack_require__(4);
+
+	var _session2 = _interopRequireDefault(_session);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// import List from './views/List'
@@ -13528,6 +13581,9 @@
 		appRoute: function appRoute() {
 			var nav = new _Nav2.default();
 			(0, _jquery2.default)('#app').empty().append(nav.render().$el);
+			console.log('session:', _session2.default);
+			console.log('session authtoken:', _session2.default.get('authtoken'));
+			console.log('session username:', _session2.default.get('username'));
 		}
 	});
 
@@ -13576,7 +13632,7 @@
 			_session2.default.login(username, password);
 		},
 		template: function template() {
-			return '\n\t\t<h2>Log In</h2>\n\t\t<input type="text" class="username" id="username" placeholder="username"/>\n\t\t<input type="text" class="password" id="password" placeholder="password"/>\n\t\t<input type="submit" class="loginBtn" id="loginBtn" value="login"/>\n\t\t<p>Not a member: <a href="#signup"> Sign up</a> </p>\n\t\t';
+			return '\n\t\t<h2>Log In</h2>\n\t\t<input type="text" class="username" id="username" placeholder="username"/>\n\t\t<input type="text" class="password" id="password" placeholder="password"/>\n\t\t<input type="submit" class="loginBtn" value="login"/>\n\t\t<p>Not a member yet? <a href="#signup"> Sign up now</a> </p>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
@@ -13634,10 +13690,11 @@
 			} else {
 				alert('Your passwords do not match. Please try again');
 			}
+
 			_session2.default.signup(newName, newUser, newPass);
 		},
 		template: function template() {
-			return '\n\t\t<h2>Sign Up</h2>\n\t\t<input type="text" id="newName" placeholder="Full Name"/>\n\t\t<input type="text" id="newUser" placeholder="Username"/>\n\t\t<input type="password" id="newPass1" placeholder="Password"/>\n\t\t<input type="password" id="newPass2" placeholder="Retype Password"/>\n\t\t<input type="submit" id="signupBtn" value="signup"/>\n\t\t<p>Already a member: <a href="#login"> Log in</a> </p>\n\t\t';
+			return '\n\t\t<h2>Sign Up</h2>\n\t\t<input type="text" id="newName" placeholder="Full Name"/>\n\t\t<input type="text" id="newUser" placeholder="Username"/>\n\t\t<input type="password" id="newPass1" placeholder="Password"/>\n\t\t<input type="password" id="newPass2" placeholder="Retype Password"/>\n\t\t<input type="submit" class="signupBtn" id="signupBtn" value="signup"/>\n\t\t<p>Already a member? <a href="#login"> Log in</a> </p>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
@@ -13678,24 +13735,373 @@
 	var Nav = _backbone2.default.View.extend({
 		tagName: 'nav',
 		className: 'nav',
-
 		events: {
 			'click .logoutBtn': 'clickHandler'
 		},
 
 		clickHandler: function clickHandler(e) {
 			console.log("log out");
+			_session2.default.logout();
 		},
 		template: function template() {
-			return '\n\t\t<nav>\n\t\t\t<button class="logoutBtn">\n\t\t\t\tLogout\n\t\t\t</button>\n\t\t\t<h3 class="getUsername"> \n\t\t\t\tHello, ' + _session2.default.get('username') + '\n\t\t\t</h3>\n\t\t</nav>\n\t\t';
+			return '\n\t\t\t  <button class="logoutBtn">logout</button>\n\t\t\t  <div class="username">\n\t\t\t    <h3>hello, \n\t\t\t      <span>' + _session2.default.get('username') + '</span> welcome to \n\t\t\t      <span class="logo">TWEE</span>\n\t\t\t    </h3>\n\t\t\t  </div>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
 			return this;
+			console.log('authtokem:', _session2.default.get('authtoken'));
 		}
 	});
 
 	exports.default = Nav;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(11);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(12)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./main.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/sass-loader/index.js!./main.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(13)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
 
 /***/ }
 /******/ ]);
