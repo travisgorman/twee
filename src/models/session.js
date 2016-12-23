@@ -8,14 +8,15 @@ const Session = Backbone.Model.extend({
 
 	defaults: {
 		username: 'defaultUsername',
+		name: 'defaultName',
 		authtoken: false,
 	},
 
 	signup(newName, newUser, newPass) {
-		console.log('name:', newName )
-		console.log('username:', newUser )
-		console.log('password:', newPass )
-		console.log('url:', session.urlRoot )
+		console.log('name:', newName)
+		console.log('username:', newUser)
+		console.log('password:', newPass)
+		console.log('url:', session.urlRoot)
 
 		this.save({
 			name: newName,
@@ -24,7 +25,9 @@ const Session = Backbone.Model.extend({
 		}, {
 			url: `https://baas.kinvey.com/user/${settings.appKey}`,
 			success: (model, response) => {
-				// model.unset('password')
+
+				console.log('response.name:--->>', response.name )
+
 				window.localStorage.setItem('username', response.username)
 				window.localStorage.setItem('authtoken', response._kmd.authtoken)
 				window.localStorage.setItem('name', response.name)
@@ -52,12 +55,10 @@ const Session = Backbone.Model.extend({
 	},
 
 	login: function(username, password) {
-
 	this.save({
 		username: username,
 		password: password
-	}, 
-	{
+	}, {
 		type: 'POST',
 		url: `https://baas.kinvey.com/user/${settings.appKey}/login`,
 		success: (model, response) => {
@@ -100,6 +101,7 @@ const Session = Backbone.Model.extend({
 		// 		throw new Error('LOGOUT FAILED')
 		// 	}
 		// });
+
 	},
 
   parse: function (response) {
@@ -119,7 +121,7 @@ const Session = Backbone.Model.extend({
     this.fetch({
       url: `https://baas.kinvey.com/user/${settings.appKey}/_me`,
       success: (model, response) => {
-        console.log('response from Kinvey/user/_me: ', response)
+        console.log('response from Kinvey/user/_me: ', response.toJSON())
         console.log('USER RETRIEVED: ', this)
       }
     })

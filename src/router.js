@@ -5,7 +5,7 @@ import Signup from './views/Signup'
 import Nav from './views/Nav'
 import session from './models/session'
 import List from './views/List'
-// import Create from './views/Create'
+import Create from './views/Create'
 
 const Router = Backbone.Router.extend({
 
@@ -29,10 +29,11 @@ const Router = Backbone.Router.extend({
 	appRoute() {
 		let nav = new Nav()
 		let list = new List()
-
+		let create = new Create()
 		$('#app').empty()
 			.append(nav.render().$el)
-				.append(list.render().$el)
+				.append(create.render().$el)
+					.append(list.render().$el)
 
 		console.log('session:', session )
 		console.log('session authtoken:', session.get('authtoken'))

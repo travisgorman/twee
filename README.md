@@ -1,4 +1,4 @@
-# Twee
+# [Twee](http://travis.bingo/twee/)
 An excessively quaint Twitter clone kinda thing.
 
 * Kinvey/MongoDB for back end data
