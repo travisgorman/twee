@@ -66,20 +66,28 @@
 
 	var _router2 = _interopRequireDefault(_router);
 
+	var _store = __webpack_require__(13);
+
+	var _store2 = _interopRequireDefault(_store);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(10);
+	__webpack_require__(15);
 
 	_session2.default.set('authtoken', localStorage.getItem('authtoken'));
 	_session2.default.set('username', localStorage.getItem('username'));
 	_session2.default.set('name', localStorage.getItem('name'));
 
+	console.groupCollapsed('session stuff');
 	console.log('session.authtoken:', _session2.default.get('authtoken'));
 	console.log('session.username:', _session2.default.get('username'));
 	console.log('session.name:', _session2.default.get('name'));
 	console.log('kinveyAuth:', 'Kinvey ' + _session2.default.get('authtoken'));
 	console.log('localStorage authtoken:', localStorage.getItem('authtoken'));
 	console.log('localStorage username:', localStorage.getItem('username'));
+	console.log('store twees collection:', _store2.default.twees);
+	console.log('store twee:', _store2.default.twee);
+	console.groupEnd('session stuff');
 
 	(0, _jquery2.default)(document).ajaxSend(function (evt, xhr, jquerySettings) {
 		if (_session2.default.get('authtoken')) {
@@ -13431,6 +13439,7 @@
 
 		defaults: {
 			username: 'defaultUsername',
+			name: 'defaultName',
 			authtoken: false
 		},
 
@@ -13449,7 +13458,9 @@
 			}, {
 				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey,
 				success: function success(model, response) {
-					// model.unset('password')
+
+					console.log('response.name:--->>', response.name);
+
 					window.localStorage.setItem('username', response.username);
 					window.localStorage.setItem('authtoken', response._kmd.authtoken);
 					window.localStorage.setItem('name', response.name);
@@ -13475,7 +13486,6 @@
 
 
 		login: function login(username, password) {
-
 			this.save({
 				username: username,
 				password: password
@@ -13541,7 +13551,7 @@
 			this.fetch({
 				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/_me',
 				success: function success(model, response) {
-					console.log('response from Kinvey/user/_me: ', response);
+					console.log('response from Kinvey/user/_me: ', response.toJSON());
 					console.log('USER RETRIEVED: ', _this2);
 				}
 			});
@@ -13603,13 +13613,15 @@
 
 	var _session2 = _interopRequireDefault(_session);
 
-	var _List = __webpack_require__(14);
+	var _List = __webpack_require__(10);
 
 	var _List2 = _interopRequireDefault(_List);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _Create = __webpack_require__(19);
 
-	// import Create from './views/Create'
+	var _Create2 = _interopRequireDefault(_Create);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Router = _backbone2.default.Router.extend({
 
@@ -13631,8 +13643,8 @@
 		appRoute: function appRoute() {
 			var nav = new _Nav2.default();
 			var list = new _List2.default();
-
-			(0, _jquery2.default)('#app').empty().append(nav.render().$el).append(list.render().$el);
+			var create = new _Create2.default();
+			(0, _jquery2.default)('#app').empty().append(nav.render().$el).append(create.render().$el).append(list.render().$el);
 
 			console.log('session:', _session2.default);
 			console.log('session authtoken:', _session2.default.get('authtoken'));
@@ -13685,7 +13697,7 @@
 			_session2.default.login(username, password);
 		},
 		template: function template() {
-			return '\n\t\t<h2>Log In</h2>\n\t\t<input type="text" class="username" id="username" placeholder="username"/>\n\t\t<input type="text" class="password" id="password" placeholder="password"/>\n\t\t<input type="submit" class="loginBtn" value="login"/>\n\t\t<p>Not a member yet? <a href="#signup"> Sign up now</a> </p>\n\t\t';
+			return '\n\t\t<h2>Log In</h2>\n\t\t<input \n\t\t\ttype="text" \n\t\t\tclass="username" \n\t\t\tid="username" \n\t\t\tplaceholder="username"/>\n\t\t<input \n\t\t\ttype="text" \n\t\t\tclass="password" \n\t\t\tid="password" \n\t\t\tplaceholder="password"/>\n\t\t<input \n\t\t\ttype="submit" \n\t\t\tclass="loginBtn" \n\t\t\tvalue="login"/>\n\t\t<p>Not a member yet? \n\t\t\t<a href="#signup"> Sign up now</a> \n\t\t</p>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
@@ -13812,13 +13824,151 @@
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _session = __webpack_require__(4);
+
+	var _session2 = _interopRequireDefault(_session);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var List = _backbone2.default.View.extend({
+		className: 'twee-list-view',
+		// initialize: {},
+
+		// events: {
+		// 	'change' : () => this.render
+		// }
+
+		template: function template() {
+			return '\n\t\t<h3>Aww shucks ' + _session2.default.get('name') + '</h3>\n\t\t<ul class="twee-list">\n\t\t\t<li class="twee-item">\n\t\t\t\t<h5>' + _session2.default.get('name') + '</h5>\n\t\t\t\t<span>timestamp</span>\n\t\t\t\t<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem ipsa ut culpa vitae, impedit consectetur aliquid qui suscipit eligendi.</p>\n\t\t\t<li>\n\t\t</ul>\n\t\t';
+		},
+
+		render: function render() {
+			this.$el.html(this.template());
+			return this;
+		}
+	});
+
+	exports.default = List;
+
+/***/ },
+/* 11 */,
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _settings = __webpack_require__(5);
+
+	var _settings2 = _interopRequireDefault(_settings);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// import moment from 'moment'
+
+	var Twee = _backbone2.default.Model.extend({
+		idAttribute: '_id',
+		urlRoot: 'https://baas.kinvey.com/appdata/' + _settings2.default.appKey + '/twees',
+		defaults: {
+			author: '',
+			body: '',
+			timestamp: new Date()
+		}
+
+	});
+
+	exports.default = Twee;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _Twee = __webpack_require__(12);
+
+	var _Twee2 = _interopRequireDefault(_Twee);
+
+	var _Twees = __webpack_require__(14);
+
+	var _Twees2 = _interopRequireDefault(_Twees);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var store = {
+		twee: new _Twee2.default(),
+		twees: new _Twees2.default()
+	};
+
+	exports.default = store;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _settings = __webpack_require__(5);
+
+	var _settings2 = _interopRequireDefault(_settings);
+
+	var _Twee = __webpack_require__(12);
+
+	var _Twee2 = _interopRequireDefault(_Twee);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Twees = _backbone2.default.Collection.extend({
+		model: _Twee2.default,
+		url: 'https://baas.kinvey.com/appdata/' + _settings2.default.appKey + '/twees/'
+	});
+
+	exports.default = Twees;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(11);
+	var content = __webpack_require__(16);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(12)(content, {});
+	var update = __webpack_require__(18)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -13835,10 +13985,10 @@
 	}
 
 /***/ },
-/* 11 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(17)();
 	// imports
 
 
@@ -13849,7 +13999,63 @@
 
 
 /***/ },
-/* 12 */
+/* 17 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -14101,63 +14307,7 @@
 
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function() {
-		var list = [];
-
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for(var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if(item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-
-		// import a list of modules into the list
-		list.i = function(modules, mediaQuery) {
-			if(typeof modules === "string")
-				modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for(var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if(typeof id === "number")
-					alreadyImportedModules[id] = true;
-			}
-			for(i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if(mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if(mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-
-/***/ },
-/* 14 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14180,25 +14330,29 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var List = _backbone2.default.View.extend({
-		className: 'twee-list-view',
-		// initialize: {},
-
-		// events: {
-		// 	'change' : () => this.render
-		// }
-
-		template: function template() {
-			return '\n\t\t<h3>Aww shucks ' + _session2.default.get('name') + '</h3>\n\t\t<ul class="twee-list">\n\t\t\t<li class="twee-item">\n\t\t\t\t<h5>' + _session2.default.get('name') + '</h5>\n\t\t\t\t<span>timestamp</span>\n\t\t\t\t<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem ipsa ut culpa vitae, impedit consectetur aliquid qui suscipit eligendi.</p>\n\t\t\t<li>\n\t\t</ul>\n\t\t';
+	var Create = _backbone2.default.View.extend({
+		tagName: 'form',
+		className: 'create-twee',
+		events: {
+			'submit': 'submitHandler'
 		},
 
+		submitHandler: function submitHandler(e) {
+			var myTwee = this.$('#compose').val();
+
+			console.log('myTwee:', myTwee);
+			console.log('submit event:', e);
+		},
+		template: function template() {
+			return '\n\t\t\t<input \n\t\t\t\ttype="text" \n\t\t\t\tclass="compose" \n\t\t\t\tid="compose" \n\t\t\t\tplaceholder="compose a twee!"/>\n\t\t\t<input \n\t\t\t\ttype="submit" \n\t\t\t\tclass="publish" \n\t\t\t\tvalue="publish"/>\n\t\t';
+		},
 		render: function render() {
 			this.$el.html(this.template());
 			return this;
 		}
 	});
 
-	exports.default = List;
+	exports.default = Create;
 
 /***/ }
 /******/ ]);
