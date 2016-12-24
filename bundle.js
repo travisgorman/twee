@@ -72,7 +72,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(15);
+	__webpack_require__(17);
 
 	_session2.default.set('authtoken', localStorage.getItem('authtoken'));
 	_session2.default.set('username', localStorage.getItem('username'));
@@ -13446,11 +13446,6 @@
 		signup: function signup(newName, newUser, newPass) {
 			var _this = this;
 
-			console.log('name:', newName);
-			console.log('username:', newUser);
-			console.log('password:', newPass);
-			console.log('url:', session.urlRoot);
-
 			this.save({
 				name: newName,
 				username: newUser,
@@ -13473,7 +13468,6 @@
 
 					console.log('SUCCESS: you created a user! Response', response);
 					console.log('SUCCESS: you created a user! Model', model);
-
 					console.log('parse this:', _this.parse(response));
 
 					_router2.default.navigate('app', { trigger: true });
@@ -13495,6 +13489,7 @@
 				success: function success(model, response) {
 					window.localStorage.setItem('authtoken', response._kmd.authtoken);
 					window.localStorage.setItem('username', response.username);
+					window.localStorage.setItem('name', response.name);
 					console.log('SUCCESS! You are logged in. MODEL:', model);
 					console.log('SUCCESS! You are logged in. RESPONSE:', response);
 					_router2.default.navigate('app', { trigger: true });
@@ -13535,6 +13530,8 @@
 		parse: function parse(response) {
 			if (response) {
 				console.log('response from Kinvey/user/{GET}:', response);
+				console.log('response from Kinvey/user/{GET USERNAME}:', response.username);
+				console.log('response from Kinvey/user/{GET NAME}:', response.name);
 				return {
 					authtoken: response._kmd.authtoken,
 					username: response.username,
@@ -13551,7 +13548,7 @@
 			this.fetch({
 				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/_me',
 				success: function success(model, response) {
-					console.log('response from Kinvey/user/_me: ', response.toJSON());
+					console.log('response from Kinvey/user/_me: ', response);
 					console.log('USER RETRIEVED: ', _this2);
 				}
 			});
@@ -13617,7 +13614,7 @@
 
 	var _List2 = _interopRequireDefault(_List);
 
-	var _Create = __webpack_require__(19);
+	var _Create = __webpack_require__(16);
 
 	var _Create2 = _interopRequireDefault(_Create);
 
@@ -13842,31 +13839,62 @@
 
 	var _session2 = _interopRequireDefault(_session);
 
+	var _Twee = __webpack_require__(11);
+
+	var _Twee2 = _interopRequireDefault(_Twee);
+
+	var _Item = __webpack_require__(12);
+
+	var _Item2 = _interopRequireDefault(_Item);
+
+	var _store = __webpack_require__(13);
+
+	var _store2 = _interopRequireDefault(_store);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var List = _backbone2.default.View.extend({
 		className: 'twee-list-view',
-		// initialize: {},
+		initialize: function initialize() {
+			var _this = this;
 
-		// events: {
-		// 	'change' : () => this.render
-		// }
+			_store2.default.twees.on('update', function () {
+				return _this.render();
+			});
+			_store2.default.twees.fetch();
+		},
 
 		template: function template() {
-			return '\n\t\t<h3>Aww shucks ' + _session2.default.get('name') + '</h3>\n\t\t<ul class="twee-list">\n\t\t\t<li class="twee-item">\n\t\t\t\t<h5>' + _session2.default.get('name') + '</h5>\n\t\t\t\t<span>timestamp</span>\n\t\t\t\t<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem ipsa ut culpa vitae, impedit consectetur aliquid qui suscipit eligendi.</p>\n\t\t\t<li>\n\t\t</ul>\n\t\t';
+			return '\n\t\t<h3>Aww shucks ' + _session2.default.get('name') + '</h3>\n\t\t<ul class="twee-list"></ul>\n\t\t';
 		},
 
 		render: function render() {
+			var _this2 = this;
+
 			this.$el.html(this.template());
+
+			_store2.default.twees.forEach(function (twee, i) {
+
+				console.groupCollapsed('twees in collection');
+				console.log('twee #' + i + ' author', twee.get('author'));
+				console.log('twee #' + i + ' body', twee.get('body'));
+				console.log('twee #' + i + ' time', twee.get('timestamp'));
+				console.groupEnd('twees in collection');
+
+				var item = new _Item2.default({
+					model: twee
+				});
+				item.render();
+				_this2.$('.twee-list').append(item.$el);
+			});
 			return this;
 		}
 	});
-
+	// import twees from '../collections/Twees'
 	exports.default = List;
 
 /***/ },
-/* 11 */,
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13901,6 +13929,49 @@
 	exports.default = Twee;
 
 /***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _store = __webpack_require__(13);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// import session from '../models/session'
+
+	var Item = _backbone2.default.View.extend({
+		tagName: 'li',
+		className: 'twee-item',
+		// events: {},
+
+		template: function template() {
+			console.log('this:', this.model);
+			return '\n\t\t<li>\n\t\t\t<h5>' + this.model.get('author') + '</h5>\n\t\t\t<time>' + this.model.get('timestamp') + '</time>\n\t\t\t<p>' + this.model.get('body') + '</p>\n\t\t</li>\n\t\t';
+		},
+		render: function render() {
+			this.$el.html(this.template());
+			return this;
+		}
+	});
+
+	exports.default = Item;
+
+/***/ },
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -13910,13 +13981,17 @@
 		value: true
 	});
 
-	var _Twee = __webpack_require__(12);
+	var _Twee = __webpack_require__(11);
 
 	var _Twee2 = _interopRequireDefault(_Twee);
 
 	var _Twees = __webpack_require__(14);
 
 	var _Twees2 = _interopRequireDefault(_Twees);
+
+	var _Item = __webpack_require__(12);
+
+	var _Item2 = _interopRequireDefault(_Item);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13945,7 +14020,7 @@
 
 	var _settings2 = _interopRequireDefault(_settings);
 
-	var _Twee = __webpack_require__(12);
+	var _Twee = __webpack_require__(11);
 
 	var _Twee2 = _interopRequireDefault(_Twee);
 
@@ -13959,16 +14034,65 @@
 	exports.default = Twees;
 
 /***/ },
-/* 15 */
+/* 15 */,
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _backbone = __webpack_require__(2);
+
+	var _backbone2 = _interopRequireDefault(_backbone);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _session = __webpack_require__(4);
+
+	var _session2 = _interopRequireDefault(_session);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Create = _backbone2.default.View.extend({
+		tagName: 'form',
+		className: 'create-twee',
+		events: {
+			'submit': 'submitHandler'
+		},
+
+		submitHandler: function submitHandler(e) {
+			var myTwee = this.$('#compose').val();
+
+			console.log('myTwee:', myTwee);
+			console.log('submit event:', e);
+		},
+		template: function template() {
+			return '\n\t\t\t<input \n\t\t\t\ttype="text" \n\t\t\t\tclass="compose" \n\t\t\t\tid="compose" \n\t\t\t\tplaceholder="compose a twee!"/>\n\t\t\t<input \n\t\t\t\ttype="submit" \n\t\t\t\tclass="publish" \n\t\t\t\tvalue="publish"/>\n\t\t';
+		},
+		render: function render() {
+			this.$el.html(this.template());
+			return this;
+		}
+	});
+
+	exports.default = Create;
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(16);
+	var content = __webpack_require__(18);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(18)(content, {});
+	var update = __webpack_require__(20)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -13985,10 +14109,10 @@
 	}
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(17)();
+	exports = module.exports = __webpack_require__(19)();
 	// imports
 
 
@@ -13999,7 +14123,7 @@
 
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports) {
 
 	/*
@@ -14055,7 +14179,7 @@
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -14305,54 +14429,6 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _backbone = __webpack_require__(2);
-
-	var _backbone2 = _interopRequireDefault(_backbone);
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _session = __webpack_require__(4);
-
-	var _session2 = _interopRequireDefault(_session);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Create = _backbone2.default.View.extend({
-		tagName: 'form',
-		className: 'create-twee',
-		events: {
-			'submit': 'submitHandler'
-		},
-
-		submitHandler: function submitHandler(e) {
-			var myTwee = this.$('#compose').val();
-
-			console.log('myTwee:', myTwee);
-			console.log('submit event:', e);
-		},
-		template: function template() {
-			return '\n\t\t\t<input \n\t\t\t\ttype="text" \n\t\t\t\tclass="compose" \n\t\t\t\tid="compose" \n\t\t\t\tplaceholder="compose a twee!"/>\n\t\t\t<input \n\t\t\t\ttype="submit" \n\t\t\t\tclass="publish" \n\t\t\t\tvalue="publish"/>\n\t\t';
-		},
-		render: function render() {
-			this.$el.html(this.template());
-			return this;
-		}
-	});
-
-	exports.default = Create;
 
 /***/ }
 /******/ ]);
