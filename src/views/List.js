@@ -1,31 +1,43 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
 import session from '../models/session'
+import Twee from '../models/Twee'
+import Item from './Item'
+// import twees from '../collections/Twees'
+import store from '../store'
 
 const List = Backbone.View.extend({
 	className: 'twee-list-view',
-	// initialize: {},
-
-	// events: {
-	// 	'change' : () => this.render
-	// }
+	initialize: function() {
+		store.twees.on('update', () => this.render());
+		store.twees.fetch();
+	},
 	
 	template: function() {
 		return `
 		<h3>Aww shucks ${session.get('name')}</h3>
-		<ul class="twee-list">
-			<li class="twee-item">
-				<h5>${session.get('name')}</h5>
-				<span>timestamp</span>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem ipsa ut culpa vitae, impedit consectetur aliquid qui suscipit eligendi.</p>
-			<li>
-		</ul>
-		`
+		<ul class="twee-list"></ul>
+		`;
 	},
 
 	render() {
 		this.$el.html(this.template())
-		return this
+
+		store.twees.forEach((twee, i) => {
+
+						console.groupCollapsed('twees in collection')
+							console.log(`twee #${i} author`, twee.get('author') )
+							console.log(`twee #${i} body`, twee.get('body') )
+							console.log(`twee #${i} time`, twee.get('timestamp') )
+						console.groupEnd('twees in collection')
+
+			let item = new Item({
+				model: twee
+			});
+			item.render();
+			this.$('.twee-list').append(item.$el);
+		});
+		return this;
 	}
 
 });

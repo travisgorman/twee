@@ -1,25 +1,26 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
 import store from '../store'
-import session from '../models/session'
+// import session from '../models/session'
 
-const Item = Backbone.Item.extend({
+const Item = Backbone.View.extend({
 	tagName: 'li',
 	className: 'twee-item',
 	// events: {},
 
 	template() {
+		console.log('this:', this.model )
 		return `
 		<li>
-			<h5>${session.get('name')}</h5>
-			<time>${store.twee.timestamp}</time>
-			<p>${store.twee.body}</p>
+			<h5>${this.model.get('author')}</h5>
+			<time>${this.model.get('timestamp')}</time>
+			<p>${this.model.get('body')}</p>
 		</li>
 		`;
 	},
 	render() {
-		this.$el.html(this.template())
-		return this
+		this.$el.html(this.template());
+		return this;
 	}
 
 });

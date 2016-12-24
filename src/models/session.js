@@ -13,11 +13,6 @@ const Session = Backbone.Model.extend({
 	},
 
 	signup(newName, newUser, newPass) {
-		console.log('name:', newName)
-		console.log('username:', newUser)
-		console.log('password:', newPass)
-		console.log('url:', session.urlRoot)
-
 		this.save({
 			name: newName,
 			username: newUser,
@@ -38,17 +33,15 @@ const Session = Backbone.Model.extend({
 				// this.set('authtoken', response._kmd.authtoken)
 				// this.set('userId', response._id)
 
-				console.log('SUCCESS: you created a user! Response', response )
-				console.log('SUCCESS: you created a user! Model', model )
-
-
-				console.log('parse this:', this.parse(response) )
+				console.log('SUCCESS: you created a user! Response', response)
+				console.log('SUCCESS: you created a user! Model', model)
+				console.log('parse this:', this.parse(response))
 
 				router.navigate('app', {trigger: true})
 
 			},
 			error: (model, response) => {
-				console.log('ERROR: signup failed', response )
+				console.log('ERROR: signup failed', response)
 			}
 		})
 
@@ -64,6 +57,7 @@ const Session = Backbone.Model.extend({
 		success: (model, response) => {
 			window.localStorage.setItem('authtoken', response._kmd.authtoken)
 			window.localStorage.setItem('username', response.username)
+			window.localStorage.setItem('name', response.name)
 			console.log('SUCCESS! You are logged in. MODEL:', model)
 			console.log('SUCCESS! You are logged in. RESPONSE:', response)
 			router.navigate('app', {trigger: true})
@@ -107,6 +101,8 @@ const Session = Backbone.Model.extend({
   parse: function (response) {
     if (response) {
       console.log('response from Kinvey/user/{GET}:', response)
+      console.log('response from Kinvey/user/{GET USERNAME}:', response.username)
+      console.log('response from Kinvey/user/{GET NAME}:', response.name)
       return {
         authtoken: response._kmd.authtoken,
         username: response.username,
@@ -121,7 +117,7 @@ const Session = Backbone.Model.extend({
     this.fetch({
       url: `https://baas.kinvey.com/user/${settings.appKey}/_me`,
       success: (model, response) => {
-        console.log('response from Kinvey/user/_me: ', response.toJSON())
+        console.log('response from Kinvey/user/_me: ', response)
         console.log('USER RETRIEVED: ', this)
       }
     })
