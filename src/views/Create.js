@@ -1,20 +1,31 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
 import session from '../models/session'
+import store from '../store'
 
 
 const Create = Backbone.View.extend({
 	tagName: 'form',
+
 	className: 'create-twee',
+
 	events: {
 		'submit' : 'submitHandler'
 	},
 
 	submitHandler(e) {
-		let myTwee = this.$('#compose').val()
+		let body = this.$('#compose').val()
+		let author = session.get('name')
 
-		console.log('myTwee:', myTwee )
+		console.log('body:', body )
+		console.log('author:', author )
 		console.log('submit event:', e)
+
+		store.twees.publish(author, body)
+
+		console.log('this.$(compose):', this.$('#compose') )
+
+		// this.reset()
 
 	},
 	

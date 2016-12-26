@@ -9,7 +9,7 @@ const Item = Backbone.View.extend({
 	// events: {},
 
 	template() {
-		console.log('this:', this.model )
+		// console.log('this:', this.model )
 		return `
 		<li>
 			<h5>${this.model.get('author')}</h5>
