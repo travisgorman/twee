@@ -72,7 +72,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(17);
+	__webpack_require__(16);
 
 	_session2.default.set('authtoken', localStorage.getItem('authtoken'));
 	_session2.default.set('username', localStorage.getItem('username'));
@@ -13614,7 +13614,7 @@
 
 	var _List2 = _interopRequireDefault(_List);
 
-	var _Create = __webpack_require__(16);
+	var _Create = __webpack_require__(15);
 
 	var _Create2 = _interopRequireDefault(_Create);
 
@@ -13855,6 +13855,7 @@
 
 	var List = _backbone2.default.View.extend({
 		className: 'twee-list-view',
+
 		initialize: function initialize() {
 			var _this = this;
 
@@ -13875,17 +13876,17 @@
 
 			_store2.default.twees.forEach(function (twee, i) {
 
-				console.groupCollapsed('twees in collection');
-				console.log('twee #' + i + ' author', twee.get('author'));
-				console.log('twee #' + i + ' body', twee.get('body'));
-				console.log('twee #' + i + ' time', twee.get('timestamp'));
-				console.groupEnd('twees in collection');
+				// console.groupCollapsed('twees in collection')
+				// 	console.log(`twee #${i} author`, twee.get('author') )
+				// 	console.log(`twee #${i} body`, twee.get('body') )
+				// 	console.log(`twee #${i} time`, twee.get('timestamp') )
+				// console.groupEnd('twees in collection')
 
 				var item = new _Item2.default({
 					model: twee
 				});
 				item.render();
-				_this2.$('.twee-list').append(item.$el);
+				_this2.$('.twee-list').prepend(item.$el);
 			});
 			return this;
 		}
@@ -13960,7 +13961,7 @@
 		// events: {},
 
 		template: function template() {
-			console.log('this:', this.model);
+			// console.log('this:', this.model )
 			return '\n\t\t<li>\n\t\t\t<h5>' + this.model.get('author') + '</h5>\n\t\t\t<time>' + this.model.get('timestamp') + '</time>\n\t\t\t<p>' + this.model.get('body') + '</p>\n\t\t</li>\n\t\t';
 		},
 		render: function render() {
@@ -14028,14 +14029,32 @@
 
 	var Twees = _backbone2.default.Collection.extend({
 		model: _Twee2.default,
-		url: 'https://baas.kinvey.com/appdata/' + _settings2.default.appKey + '/twees/'
+		url: 'https://baas.kinvey.com/appdata/' + _settings2.default.appKey + '/twees/',
+
+		publish: function publish(author, body) {
+
+			// console.log('author from collection:', author )
+			// console.log('body from collection:', body )
+
+			this.create({
+				author: author,
+				body: body
+			}, {
+				success: function success(response) {
+					console.log('SUCCESS! You created a new Twee:', response);
+				},
+				error: function error(response) {
+					console.log('ERROR!:', response);
+				}
+			});
+		}
+
 	});
 
 	exports.default = Twees;
 
 /***/ },
-/* 15 */,
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14056,20 +14075,34 @@
 
 	var _session2 = _interopRequireDefault(_session);
 
+	var _store = __webpack_require__(13);
+
+	var _store2 = _interopRequireDefault(_store);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Create = _backbone2.default.View.extend({
 		tagName: 'form',
+
 		className: 'create-twee',
+
 		events: {
 			'submit': 'submitHandler'
 		},
 
 		submitHandler: function submitHandler(e) {
-			var myTwee = this.$('#compose').val();
+			var body = this.$('#compose').val();
+			var author = _session2.default.get('name');
 
-			console.log('myTwee:', myTwee);
+			console.log('body:', body);
+			console.log('author:', author);
 			console.log('submit event:', e);
+
+			_store2.default.twees.publish(author, body);
+
+			console.log('this.$(compose):', this.$('#compose'));
+
+			// this.reset()
 		},
 		template: function template() {
 			return '\n\t\t\t<input \n\t\t\t\ttype="text" \n\t\t\t\tclass="compose" \n\t\t\t\tid="compose" \n\t\t\t\tplaceholder="compose a twee!"/>\n\t\t\t<input \n\t\t\t\ttype="submit" \n\t\t\t\tclass="publish" \n\t\t\t\tvalue="publish"/>\n\t\t';
@@ -14083,16 +14116,16 @@
 	exports.default = Create;
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(18);
+	var content = __webpack_require__(17);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(20)(content, {});
+	var update = __webpack_require__(19)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -14109,21 +14142,21 @@
 	}
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(19)();
+	exports = module.exports = __webpack_require__(18)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n\n.twee-list-view {\n  border: 10px solid #FFC600; }\n\n.twee-list {\n  border: 8px solid #FFC600;\n  padding: 1.5rem; }\n\n.twee-item {\n  border: 5px solid red; }\n", ""]);
+	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n\n.twee-list-view {\n  border: 10px solid #FFC600; }\n\n.twee-list {\n  border: 8px solid #FFC600;\n  padding: 1.5rem; }\n\n.twee-item {\n  border: 5px solid red; }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports) {
 
 	/*
@@ -14179,7 +14212,7 @@
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
