@@ -1,6 +1,6 @@
 import Backbone from 'backbone'
 import settings from '../settings'
-// import moment from 'moment'
+import moment from 'moment'
 
 const Twee = Backbone.Model.extend({
 	idAttribute: '_id',
@@ -9,7 +9,7 @@ const Twee = Backbone.Model.extend({
 		author: '',
 		username: '',
 		body: '',
-		timestamp: new Date()
+		timestamp: moment().format('MMM Do YYYY, h:mm a')
 	},
 
 });
