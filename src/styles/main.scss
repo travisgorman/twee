@@ -126,6 +126,7 @@ nav {
   align-self: flex-start;
   width: 100%;
   padding: 0 1.5rem;
+  // margin-bottom: 1.5rem;
 	button {
     padding: .5rem 1.3rem;
     background: $logoutBtn;
@@ -159,29 +160,59 @@ nav {
 }
 
 // twee list
-
+ul {
+	padding-start: 0;
+}
 .twee-list-view {
 	border: 10px solid #FFC600;
+	width: 90%;
 }
 // h3
 .twee-list {
 	border: 8px solid #FFC600;
-	padding: 1.5rem;
+	margin: none;
+	padding: 0;
+	list-style-type: none;
 }
 // ul
 // li
 .twee-item {
 	border: 5px solid red;
+	padding: .5rem;
+	.whois {
+		display: flex;
+		.author {
+			color: #333;
+			margin-right: .5rem;
+		}
+		.username {
+			color: blue;
+			margin-right: .5rem;
+		}
+		
+	}
+
+
 }
 // h5
-// span
+// time
 // p
 
-
-
-
-
-
+.create-twee {
+	margin: 3rem auto;
+	padding: 2rem;
+	border: 2px solid #DC2448;
+	width: 100%;
+	text-align: center;
+	input {
+		padding: .75rem;
+		font-size: 1rem;
+		border-radius: 6px;
+		.compose {
+			width: 18rem;
+		}
+	}
+}
 
 
 

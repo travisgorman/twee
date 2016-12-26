@@ -16,17 +16,9 @@ const Create = Backbone.View.extend({
 	submitHandler(e) {
 		let body = this.$('#compose').val()
 		let author = session.get('name')
-
-		console.log('body:', body )
-		console.log('author:', author )
-		console.log('submit event:', e)
-
-		store.twees.publish(author, body)
-
-		console.log('this.$(compose):', this.$('#compose') )
-
-		// this.reset()
-
+		let username = session.get('username')
+		store.twees.publish(author, body, username)
+		this.el.reset()
 	},
 	
 	template() {

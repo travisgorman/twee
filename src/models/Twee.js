@@ -7,6 +7,7 @@ const Twee = Backbone.Model.extend({
 	urlRoot: `https://baas.kinvey.com/appdata/${settings.appKey}/twees`,
 	defaults: {
 		author: '',
+		username: '',
 		body: '',
 		timestamp: new Date()
 	},

@@ -1,7 +1,7 @@
 import Backbone from 'backbone'
 import $ from 'jquery'
 import store from '../store'
-// import session from '../models/session'
+import session from '../models/session'
 
 const Item = Backbone.View.extend({
 	tagName: 'li',
@@ -9,11 +9,14 @@ const Item = Backbone.View.extend({
 	// events: {},
 
 	template() {
-		// console.log('this:', this.model )
+		console.log('this:', this.model )
 		return `
 		<li>
-			<h5>${this.model.get('author')}</h5>
-			<time>${this.model.get('timestamp')}</time>
+			<div class='whois'>
+				<h5 class="author">${this.model.get('author')}</h5>
+				<h5 class="username">@${this.model.get('username')}</h5>
+				<h5>${this.model.get('timestamp')}</h5>
+			</div>			
 			<p>${this.model.get('body')}</p>
 		</li>
 		`;
