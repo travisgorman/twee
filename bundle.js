@@ -13971,7 +13971,7 @@
 		},
 
 		editHandler: function editHandler(e) {
-			this.$el.context.innerHTML = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\n\t\t\t\t<form class="update">\n\t\t\t\t\t<input type="text" class="newBody" placeholder="' + this.model.get('body') + '"/>\n\t\t\t\t\t<input type="submit" class="updateBtn" value="update"/>\n\t\t\t\t</form>\t\t\n\t\t\t\t\n\t\t\t</li>\n\t\t';
+			this.$el.context.innerHTML = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\n\t\t\t\t<form class="update">\n\t\t\t\t\t<input type="text" class="newBody" placeholder="' + this.model.get('body') + '"/>\n\t\t\t\t\t<input type="submit" class="updateBtn" value="update"/>\n\t\t\t\t</form>\t\t\n\t\t\t</li>\n\t\t';
 		},
 		updateTwee: function updateTwee(e) {
 			console.log('update twee submit event:', e);
@@ -13987,10 +13987,12 @@
 					console.log('SUCCESS! response:', response);
 				}
 			});
+			this.renderNew();
 		},
-		bodyHandler: function bodyHandler(e) {
+		renderNew: function renderNew(e) {
 			console.log('body handler:', e);
 			console.log('body:', this.model.get('body'));
+			this.$el.context.innerHTML = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\n\t\t\t\t<p class="body">' + this.model.get('body') + '</p>\n\t\t\t</li>\n\t\t';
 		},
 		deleteHandler: function deleteHandler(e) {
 			console.log('delete click event:', e);
@@ -14003,7 +14005,7 @@
 			});
 		},
 		template: function template() {
-			var userItem = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\t\t\t\n\t\t\t\t<p class="body" contenteditable="true">' + this.model.get('body') + '</p>\n\t\t\t</li>\n\t\t';
+			var userItem = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\t\t\t\n\t\t\t\t<p class="body">' + this.model.get('body') + '</p>\n\t\t\t</li>\n\t\t';
 			if (this.model.get('username') === _session2.default.get('username')) {
 				return userItem;
 			}
