@@ -100,9 +100,9 @@ const Session = Backbone.Model.extend({
 
   parse: function (response) {
     if (response) {
-      console.log('response from Kinvey/user/{GET}:', response)
-      console.log('response from Kinvey/user/{GET USERNAME}:', response.username)
-      console.log('response from Kinvey/user/{GET NAME}:', response.name)
+      // console.log('response from Kinvey/user/{GET}:', response)
+      // console.log('response from Kinvey/user/{GET USERNAME}:', response.username)
+      // console.log('response from Kinvey/user/{GET NAME}:', response.name)
       return {
         authtoken: response._kmd.authtoken,
         username: response.username,
@@ -116,10 +116,10 @@ const Session = Backbone.Model.extend({
 		retrieve: function () {
     this.fetch({
       url: `https://baas.kinvey.com/user/${settings.appKey}/_me`,
-      success: (model, response) => {
-        console.log('response from Kinvey/user/_me: ', response)
-        console.log('USER RETRIEVED: ', this)
-      }
+      // success: (model, response) => {
+      //   console.log('response from Kinvey/user/_me: ', response)
+      //   console.log('USER RETRIEVED: ', this)
+      // }
     })
   },
 

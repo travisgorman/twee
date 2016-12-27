@@ -13529,9 +13529,9 @@
 
 		parse: function parse(response) {
 			if (response) {
-				console.log('response from Kinvey/user/{GET}:', response);
-				console.log('response from Kinvey/user/{GET USERNAME}:', response.username);
-				console.log('response from Kinvey/user/{GET NAME}:', response.name);
+				// console.log('response from Kinvey/user/{GET}:', response)
+				// console.log('response from Kinvey/user/{GET USERNAME}:', response.username)
+				// console.log('response from Kinvey/user/{GET NAME}:', response.name)
 				return {
 					authtoken: response._kmd.authtoken,
 					username: response.username,
@@ -13543,14 +13543,8 @@
 		},
 
 		retrieve: function retrieve() {
-			var _this2 = this;
-
 			this.fetch({
-				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/_me',
-				success: function success(model, response) {
-					console.log('response from Kinvey/user/_me: ', response);
-					console.log('USER RETRIEVED: ', _this2);
-				}
+				url: 'https://baas.kinvey.com/user/' + _settings2.default.appKey + '/_me'
 			});
 		}
 
@@ -13643,9 +13637,9 @@
 			var create = new _Create2.default();
 			(0, _jquery2.default)('#app').empty().append(nav.render().$el).append(create.render().$el).append(list.render().$el);
 
-			console.log('session:', _session2.default);
-			console.log('session authtoken:', _session2.default.get('authtoken'));
-			console.log('session username:', _session2.default.get('username'));
+			// console.log('session:', session )
+			// console.log('session authtoken:', session.get('authtoken'))
+			// console.log('session username:', session.get('username'))
 		}
 	});
 
@@ -13811,7 +13805,7 @@
 		render: function render() {
 			this.$el.html(this.template());
 			return this;
-			console.log('authtokem:', _session2.default.get('authtoken'));
+			// console.log('authtoken:', session.get('authtoken'))
 		}
 	});
 
@@ -13961,13 +13955,59 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Item = _backbone2.default.View.extend({
-		tagName: 'li',
-		className: 'twee-item',
-		// events: {},
 
+		tagName: 'li',
+
+		className: 'twee-item',
+
+		events: {
+			'click .editBtn': 'editHandler',
+			'click .deleteBtn': 'deleteHandler',
+			'click .body': 'bodyHandler',
+			'submit .update': 'updateTwee',
+			'change': function change() {
+				return console.log('your view has changed');
+			}
+		},
+
+		editHandler: function editHandler(e) {
+			this.$el.context.innerHTML = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\n\t\t\t\t<form class="update">\n\t\t\t\t\t<input type="text" class="newBody" placeholder="' + this.model.get('body') + '"/>\n\t\t\t\t\t<input type="submit" class="updateBtn" value="update"/>\n\t\t\t\t</form>\t\t\n\t\t\t\t\n\t\t\t</li>\n\t\t';
+		},
+		updateTwee: function updateTwee(e) {
+			console.log('update twee submit event:', e);
+			var newBody = this.$('.newBody').val();
+			// console.log('this.model:', this.model )
+			console.log('newBody:', newBody);
+
+			this.model.save({
+				body: newBody
+			}, {
+				success: function success(model, response) {
+					console.log('SUCCESS! model:', model);
+					console.log('SUCCESS! response:', response);
+				}
+			});
+		},
+		bodyHandler: function bodyHandler(e) {
+			console.log('body handler:', e);
+			console.log('body:', this.model.get('body'));
+		},
+		deleteHandler: function deleteHandler(e) {
+			console.log('delete click event:', e);
+			console.log('this model id:', this.model.get('_id'));
+			this.model.destroy({
+				success: function success(model, response) {
+					console.log('SUCCESS! model:', model);
+					console.log('SUCCESS! response:', response);
+				}
+			});
+		},
 		template: function template() {
-			console.log('this:', this.model);
-			return '\n\t\t<li>\n\t\t\t<div class=\'whois\'>\n\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t<h5>' + this.model.get('timestamp') + '</h5>\n\t\t\t</div>\t\t\t\n\t\t\t<p>' + this.model.get('body') + '</p>\n\t\t</li>\n\t\t';
+			var userItem = '\n\t\t\t<li class="twee">\n\t\t\t\t<div class=\'whois\'>\n\t\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t\t\t<button class="editBtn">Edit</button>\n\t\t\t\t\t<button class="deleteBtn">Delete</button>\n\t\t\t\t</div>\t\t\t\n\t\t\t\t<p class="body" contenteditable="true">' + this.model.get('body') + '</p>\n\t\t\t</li>\n\t\t';
+			if (this.model.get('username') === _session2.default.get('username')) {
+				return userItem;
+			}
+			return '\n\t\t<li>\n\t\t\t<div class=\'whois\'>\n\t\t\t\t<h5 class="author">' + this.model.get('author') + '</h5>\n\t\t\t\t<h5 class="username">@' + this.model.get('username') + '</h5>\n\t\t\t\t<h5 class="timestamp">' + this.model.get('timestamp') + '</h5>\n\t\t\t</div>\t\t\t\n\t\t\t<p>' + this.model.get('body') + '</p>\n\t\t</li>\n\t\t';
 		},
 		render: function render() {
 			this.$el.html(this.template());
@@ -14149,7 +14189,7 @@
 
 
 	// module
-	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n\nul {\n  padding-start: 0; }\n\n.twee-list-view {\n  border: 10px solid #FFC600;\n  width: 90%; }\n\n.twee-list {\n  border: 8px solid #FFC600;\n  margin: none;\n  padding: 0;\n  list-style-type: none; }\n\n.twee-item {\n  border: 5px solid red;\n  padding: .5rem; }\n  .twee-item .whois {\n    display: flex; }\n    .twee-item .whois .author {\n      color: #333;\n      margin-right: .5rem; }\n    .twee-item .whois .username {\n      color: blue;\n      margin-right: .5rem; }\n\n.create-twee {\n  margin: 3rem auto;\n  padding: 2rem;\n  border: 2px solid #DC2448;\n  width: 100%;\n  text-align: center; }\n  .create-twee input {\n    padding: .75rem;\n    font-size: 1rem;\n    border-radius: 6px; }\n", ""]);
+	exports.push([module.id, "* {\n  box-sizing: border-box; }\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n  background: #23BCD4;\n  font-size: 16px; }\n\n.container {\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center; }\n\n.login-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .login-form h2 {\n    color: #333; }\n  .login-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .login-form input.loginBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .login-form input.loginBtn:hover {\n      background: #34BD87; }\n  .login-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .login-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .login-form a:hover {\n      text-decoration: underline; }\n\n.signup-form {\n  border-radius: 3px;\n  width: 500px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  background: #5fd2e5; }\n  .signup-form h2 {\n    color: #333; }\n  .signup-form input {\n    font-size: 1rem;\n    width: 400px;\n    margin: .5rem;\n    padding: .5rem;\n    border: none;\n    border-radius: 3px;\n    color: #333333; }\n  .signup-form input.signupBtn {\n    background: #148E8E;\n    color: #EEEEEE;\n    letter-spacing: 2px;\n    font-weight: 100;\n    width: 140px;\n    padding: .5rem;\n    border-radius: 6px; }\n    .signup-form input.signupBtn:hover {\n      background: #34BD87; }\n  .signup-form p {\n    color: #333333;\n    margin-right: .5rem; }\n  .signup-form a {\n    color: #BE2C23;\n    text-decoration: none; }\n    .signup-form a:hover {\n      text-decoration: underline; }\n\nnav {\n  background: #193549;\n  color: #EEEEEE;\n  letter-spacing: 2px;\n  font-size: 1.4rem;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  align-self: flex-start;\n  width: 100%;\n  padding: 0 1.5rem; }\n  nav button {\n    padding: .5rem 1.3rem;\n    background: #34BD87;\n    border: none;\n    color: #EEEEEE;\n    font-weight: 100;\n    letter-spacing: 2px;\n    font-size: 1.4rem;\n    border-radius: 8px; }\n    nav button:hover {\n      background: #54d09f;\n      cursor: pointer; }\n  nav .username {\n    display: flex;\n    letter-spacing: 2px;\n    justify-content: flex-end;\n    flex: 1; }\n    nav .username h3 {\n      font-size: 1.4rem;\n      font-weight: 100; }\n      nav .username h3 span {\n        color: #FC4756; }\n      nav .username h3 .logo {\n        color: #34BD87; }\n\nul {\n  padding-start: 0; }\n\n.twee-list-view {\n  border: 10px solid #FFC600;\n  width: 90%; }\n\n.twee-list {\n  border: 8px solid #FFC600;\n  margin: none;\n  padding: 0;\n  list-style-type: none; }\n\n.twee-item {\n  border: 5px solid red;\n  padding: .5rem; }\n  .twee-item .whois {\n    display: flex; }\n    .twee-item .whois .author {\n      color: #333;\n      margin-right: .5rem; }\n    .twee-item .whois .username {\n      color: blue;\n      margin-right: .5rem; }\n    .twee-item .whois .timestamp {\n      margin-right: .5rem; }\n\n.create-twee {\n  margin: 3rem auto;\n  padding: 2rem;\n  border: 2px solid #DC2448;\n  width: 100%;\n  text-align: center; }\n  .create-twee input {\n    padding: .75rem;\n    font-size: 1rem;\n    border-radius: 6px; }\n", ""]);
 
 	// exports
 

@@ -35,9 +35,9 @@ const Router = Backbone.Router.extend({
 				.append(create.render().$el)
 					.append(list.render().$el)
 
-		console.log('session:', session )
-		console.log('session authtoken:', session.get('authtoken'))
-		console.log('session username:', session.get('username'))
+		// console.log('session:', session )
+		// console.log('session authtoken:', session.get('authtoken'))
+		// console.log('session username:', session.get('username'))
 	},
 	
 });

@@ -30,7 +30,7 @@ const Nav = Backbone.View.extend({
 	render() {
 		this.$el.html(this.template())
 		return this
-		console.log('authtokem:', session.get('authtoken') )
+		// console.log('authtoken:', session.get('authtoken'))
 	}
 	
 });
