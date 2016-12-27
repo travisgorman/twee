@@ -31,7 +31,6 @@ const Item = Backbone.View.extend({
 					<input type="text" class="newBody" placeholder="${this.model.get('body')}"/>
 					<input type="submit" class="updateBtn" value="update"/>
 				</form>		
-				
 			</li>
 		`;
 	},
@@ -49,12 +48,25 @@ const Item = Backbone.View.extend({
 				console.log('SUCCESS! model:', model )
 				console.log('SUCCESS! response:', response )
 			}
-		})
+		});
+		this.renderNew()
 	},
 
-	bodyHandler(e) {
+	renderNew(e) {
 		console.log('body handler:', e )
 		console.log('body:', this.model.get('body'))
+		this.$el.context.innerHTML = `
+			<li class="twee">
+				<div class='whois'>
+					<h5 class="author">${this.model.get('author')}</h5>
+					<h5 class="username">@${this.model.get('username')}</h5>
+					<h5 class="timestamp">${this.model.get('timestamp')}</h5>
+					<button class="editBtn">Edit</button>
+					<button class="deleteBtn">Delete</button>
+				</div>
+				<p class="body">${this.model.get('body')}</p>
+			</li>
+		`;
 	},
 
 	deleteHandler(e) {
@@ -78,7 +90,7 @@ const Item = Backbone.View.extend({
 					<button class="editBtn">Edit</button>
 					<button class="deleteBtn">Delete</button>
 				</div>			
-				<p class="body" contenteditable="true">${this.model.get('body')}</p>
+				<p class="body">${this.model.get('body')}</p>
 			</li>
 		`;
 		if (this.model.get('username') === session.get('username')) {
