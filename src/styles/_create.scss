@@ -9,6 +9,12 @@
 		font-size: 1rem;
 		border-radius: 6px;
 	}
+	input[type="submit"] {
+		border: none;
+		font-width: lighten;
+		color: #fff;
+		background: $logoutBtn;
+	}
 	input[type="text"] {
 		width: 60%;
 	}

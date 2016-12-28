@@ -13,11 +13,12 @@ const Item = Backbone.View.extend({
 		'click .editBtn' : 'editHandler',
 		'click .deleteBtn' : 'deleteHandler',
 		'click .body' : 'bodyHandler',
+		'click .cancelBtn' : 'cancelHandler',
 		'submit .update' : 'updateTwee',
-		'change' : () => console.log( 'your view has changed' )
 	},
 	
 	editHandler(e) {
+		console.log('element:', this.$('.newBody') )
 		this.$el.context.innerHTML = `
 				<header>
 					<div class='whois'>
@@ -25,15 +26,34 @@ const Item = Backbone.View.extend({
 						<h5 class="username">@${this.model.get('username')}</h5>
 						<h5 class="timestamp">${this.model.get('timestamp')}</h5>
 					</div>
+					<div class="actions">						
+						<button class="deleteBtn">Delete</button>
+					</div>	
+				</header>
+				<form class="update">
+					<input type="text" class="newBody" placeholder="${this.model.get('body')}" autofocus/>
+					<input type="submit" class="updateBtn" value="update"/>
+					<input type="button" class="cancelBtn" value="cancel"/>
+				</form>		
+		`;
+	},
+
+	cancelHandler() {
+		this.$el.context.innerHTML = `
+				<header>
+					<div class='whois'>
+						<h5 class="author">${this.model.get('author')}</h5>
+						<h5 class="username">@${this.model.get('username')}</h5>
+					</div>
 					<div class="actions">
 						<button class="editBtn">Edit</button>
 						<button class="deleteBtn">Delete</button>
 					</div>	
 				</header>
-				<form class="update">
-					<input type="text" class="newBody" placeholder="${this.model.get('body')}"/>
-					<input type="submit" class="updateBtn" value="update"/>
-				</form>		
+				<p class="body">${this.model.get('body')}</p>
+				<footer>
+					<h5 class="timestamp">${this.model.get('timestamp')}</h5>
+				</footer>
 		`;
 	},
 

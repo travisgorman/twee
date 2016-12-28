@@ -3,8 +3,9 @@
 form.update {
 	padding: .9rem;
 	input[type="text"] {
-		width: 90%;
+		width: 75%;
 		padding: .5rem;
+		margin-right: 1rem;
 		font-size: .9rem;
 		border: 1px solid #dadada;
 	}
@@ -12,5 +13,15 @@ form.update {
 		border: none;
 		padding: none;
 	}
+	input[type="button"] {
+		border: none;
+	}
+	.updateBtn {
+  	background: #34BD87;
+  	color: #fff;
+	}
+	.cancelBtn {
+		background: #FC4756;
+		color: #fff;		
+	}
 }
-
