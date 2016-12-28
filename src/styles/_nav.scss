@@ -1,0 +1,44 @@
+@import 'variables';
+
+nav {
+  background: $navBg;
+  color: $offWhite;
+  letter-spacing: 2px;
+  font-size: 1.4rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  align-self: flex-start;
+  width: 100%;
+  padding: 0 1.5rem;
+	button {
+    padding: .5rem 1.3rem;
+    background: $logoutBtn;
+    border: none;
+    color: $offWhite;
+    font-weight: 100;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+    border-radius: 8px;
+    &:hover {
+    	background: lighten(#34BD87, 10);
+    	cursor: pointer;
+    }
+  }
+	.username {
+    display: flex;
+    letter-spacing: 2px;
+    justify-content: flex-end;
+    flex: 1;
+		h3 {
+			font-size: 1.4rem;
+			font-weight: 100;
+			span {
+				color: $accent;
+			}
+			.logo {
+      	color: $logoutBtn;
+			}
+		}
+	}
+}

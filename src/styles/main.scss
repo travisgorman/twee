@@ -1,12 +1,11 @@
-$offWhite: #EEEEEE;
-$offBlack: #333333;
-$brightBlue: #23BCD4;
-$navBg: #193549;
-$logoutBtn: #34BD87;
-$loginBtn: #148E8E;
-$formBg: #5fd2e5;
-$link: #BE2C23;
-$accent: #FC4756;
+@import 'variables';
+@import 'create';
+@import 'login';
+@import 'signup';
+@import 'nav';
+@import 'list';
+@import 'item';
+@import 'update';
 
 * {
 	box-sizing: border-box;
@@ -15,7 +14,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: sans-serif;
-	background: $brightBlue;
+	background: $offWhite;
 	font-size: 16px;
 }
 .container {
@@ -25,205 +24,7 @@ body {
 	justify-content: center;
 	align-items: center;
 }
-.login-form {
-	border-radius: 3px;
-	width: 500px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	background: $formBg;
-	h2 {
-		color: #333;
-	}
-  input {
-  	font-size: 1rem;
-  	width: 400px;
-  	margin: .5rem;
-  	padding: .5rem;
-  	border: none;
-  	border-radius: 3px;
-  	color: $offBlack;
-  }
-  	input.loginBtn {
-			background: $loginBtn;
-			color: $offWhite;
-			letter-spacing: 2px;
-			font-weight: 100;
-			width: 140px;
-			padding: .5rem;
-			border-radius: 6px;
-			&:hover {
-				background: #34BD87;
-			}
-		}
-  p {
-  	color: $offBlack;
-  	margin-right: .5rem;
-  }
-  a {
-  	color: $link;
-  	text-decoration: none;
-  	&:hover {
-			text-decoration: underline;
-	  }
-	}		
-}
-
-.signup-form {
-	border-radius: 3px;
-	width: 500px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	background: $formBg;
-	h2 {
-		color: #333;
-	}
-  input {
-  	font-size: 1rem;
-  	width: 400px;
-  	margin: .5rem;
-  	padding: .5rem;
-  	border: none;
-  	border-radius: 3px;
-  	color: $offBlack;
-  }
-	input.signupBtn {
-		background: $loginBtn;
-		color: $offWhite;
-		letter-spacing: 2px;
-		font-weight: 100;
-		width: 140px;
-		padding: .5rem;
-		border-radius: 6px;
-		&:hover {
-			background: #34BD87;
-		}
-	}
-  p {
-  	color: $offBlack;
-  	margin-right: .5rem;
-  }
-  a {
-  	color: $link;
-  	text-decoration: none;
-  	&:hover {
-			text-decoration: underline;
-	  }
-	}		
-}
-
-nav {
-  background: $navBg;
-  color: $offWhite;
-  letter-spacing: 2px;
-  font-size: 1.4rem;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  align-self: flex-start;
-  width: 100%;
-  padding: 0 1.5rem;
-  // margin-bottom: 1.5rem;
-	button {
-    padding: .5rem 1.3rem;
-    background: $logoutBtn;
-    border: none;
-    color: $offWhite;
-    font-weight: 100;
-    letter-spacing: 2px;
-    font-size: 1.4rem;
-    border-radius: 8px;
-    &:hover {
-    	background: lighten(#34BD87, 10);
-    	cursor: pointer;
-    }
-  }
-	.username {
-    display: flex;
-    letter-spacing: 2px;
-    justify-content: flex-end;
-    flex: 1;
-		h3 {
-			font-size: 1.4rem;
-			font-weight: 100;
-			span {
-				color: $accent;
-			}
-			.logo {
-      	color: $logoutBtn;
-			}
-		}
-	}
-}
-
-// twee list
 ul {
 	padding-start: 0;
 }
-.twee-list-view {
-	border: 10px solid #FFC600;
-	width: 90%;
-}
-// h3
-.twee-list {
-	border: 8px solid #FFC600;
-	margin: none;
-	padding: 0;
-	list-style-type: none;
-}
-// ul
-// li
-.twee-item {
-	border: 5px solid red;
-	padding: .5rem;
-	.whois {
-		display: flex;
-		.author {
-			color: #333;
-			margin-right: .5rem;
-		}
-		.username {
-			color: blue;
-			margin-right: .5rem;
-		}
-		.timestamp {
-			margin-right: .5rem;
-		}
-		// .editBtn {
-		// 	align-self: flex-end;
-		// }
-		// .deleteBtn {
-		// 	align-self: flex-end;
-		// }
-	}
-
-
-}
-// h5
-// time
-// p
-
-.create-twee {
-	margin: 3rem auto;
-	padding: 2rem;
-	border: 2px solid #DC2448;
-	width: 100%;
-	text-align: center;
-	input {
-		padding: .75rem;
-		font-size: 1rem;
-		border-radius: 6px;
-	}
-}
-
-
-
-
-
-
-
-
 

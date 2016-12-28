@@ -1,0 +1,15 @@
+@import 'variables';
+
+.create-twee {
+	padding: 1rem;
+	width: 100%;
+	text-align: center;
+	input {
+		padding: .75rem;
+		font-size: 1rem;
+		border-radius: 6px;
+	}
+	input[type="text"] {
+		width: 60%;
+	}
+}

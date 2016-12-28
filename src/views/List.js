@@ -16,7 +16,6 @@ const List = Backbone.View.extend({
 	
 	template: function() {
 		return `
-		<h3>Aww shucks ${session.get('name')}</h3>
 		<ul class="twee-list"></ul>
 		`;
 	},
